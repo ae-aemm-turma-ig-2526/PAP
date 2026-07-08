@@ -161,10 +161,11 @@ async function carregarCarrosAdmin() {
         <td>${esc(c.combustivel || '—')}</td>
         <td>${Number(c.preco).toLocaleString('pt-PT', {style:'currency',currency:'EUR'})}</td>
         <td><span class="badge ${c.ativo ? 'concluido' : 'cancelado'}">${c.ativo ? 'Ativo' : 'Inativo'}</span></td>
-        <td>
-          ${c.ativo
-            ? `<button class="btn btn-sm btn-danger" onclick="removerCarro(${c.id})">Remover</button>`
-            : '<span style="color:var(--gray);font-size:0.85rem">Removido</span>'}
+        <td style="display:flex;gap:6px;flex-wrap:wrap">
+          ${c.ativo ? `
+            <button class="btn btn-sm" onclick='abrirEditar(${JSON.stringify(c)})'>Editar</button>
+            <button class="btn btn-sm btn-danger" onclick="removerCarro(${c.id})">Remover</button>
+          ` : '<span style="color:var(--gray);font-size:0.85rem">Removido</span>'}
         </td>
       </tr>
     `).join('');
@@ -239,6 +240,91 @@ document.getElementById('form-add-carro').addEventListener('submit', async e => 
   } finally {
     btn.disabled = false;
     btn.textContent = 'Adicionar Carro';
+  }
+});
+
+// ── Editar Carro ─────────────────────────────────────────────────────────────
+
+function abrirEditar(carro) {
+  document.getElementById('e-id').value          = carro.id;
+  document.getElementById('e-marca').value        = carro.marca || '';
+  document.getElementById('e-modelo').value       = carro.modelo || '';
+  document.getElementById('e-ano').value          = carro.ano || '';
+  document.getElementById('e-km').value           = carro.km || '';
+  document.getElementById('e-combustivel').value  = carro.combustivel || '';
+  document.getElementById('e-preco').value        = carro.preco || '';
+  document.getElementById('e-descricao').value    = carro.descricao || '';
+  document.getElementById('e-imagem').value       = '';
+  const preview = document.getElementById('e-imagem-preview');
+  if (carro.imagem) { preview.src = carro.imagem; preview.style.display = 'block'; }
+  else { preview.style.display = 'none'; }
+  document.getElementById('editar-ref').textContent = `${carro.marca} ${carro.modelo}`;
+  document.getElementById('msg-editar').innerHTML = '';
+  document.getElementById('modal-editar').classList.add('open');
+}
+
+document.getElementById('editar-close').addEventListener('click', () => {
+  document.getElementById('modal-editar').classList.remove('open');
+});
+document.getElementById('modal-editar').addEventListener('click', e => {
+  if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
+});
+
+document.getElementById('e-imagem').addEventListener('change', e => {
+  const file = e.target.files[0];
+  const preview = document.getElementById('e-imagem-preview');
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => { preview.src = ev.target.result; preview.style.display = 'block'; };
+  reader.readAsDataURL(file);
+});
+
+document.getElementById('form-editar').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button[type=submit]');
+  btn.disabled = true;
+  btn.textContent = 'A guardar…';
+
+  const imgFile = document.getElementById('e-imagem').files[0];
+  let imagem = null;
+  if (imgFile) {
+    imagem = await new Promise(resolve => {
+      const r = new FileReader();
+      r.onload = ev => resolve(ev.target.result);
+      r.readAsDataURL(imgFile);
+    });
+  }
+
+  const id = document.getElementById('e-id').value;
+  const payload = {
+    marca:       document.getElementById('e-marca').value.trim(),
+    modelo:      document.getElementById('e-modelo').value.trim(),
+    ano:         document.getElementById('e-ano').value || null,
+    km:          document.getElementById('e-km').value || null,
+    combustivel: document.getElementById('e-combustivel').value || null,
+    preco:       document.getElementById('e-preco').value,
+    descricao:   document.getElementById('e-descricao').value.trim(),
+    ...(imagem !== null && { imagem }),
+  };
+
+  try {
+    const res = await fetch(`${API}/carros/${id}`, {
+      method: 'PUT',
+      headers: authHeaders(),
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Erro ao guardar.');
+    document.getElementById('msg-editar').innerHTML = '<div class="msg success">✅ Carro actualizado!</div>';
+    setTimeout(() => {
+      document.getElementById('modal-editar').classList.remove('open');
+      carregarCarrosAdmin();
+    }, 1200);
+  } catch (err) {
+    document.getElementById('msg-editar').innerHTML = `<div class="msg error">❌ ${err.message}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Guardar Alterações';
   }
 });
 

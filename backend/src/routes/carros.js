@@ -55,6 +55,26 @@ router.post('/', adminAuth, async (req, res) => {
   }
 });
 
+// Admin: editar carro
+router.put('/:id', adminAuth, async (req, res) => {
+  const { marca, modelo, ano, km, combustivel, preco, imagem, descricao } = req.body;
+  if (!marca || !modelo || !preco)
+    return res.status(400).json({ error: 'Marca, modelo e preço são obrigatórios.' });
+  try {
+    const result = await pool.query(
+      `UPDATE carros SET marca=$1, modelo=$2, ano=$3, km=$4, combustivel=$5, preco=$6, imagem=$7, descricao=$8
+       WHERE id=$9 RETURNING *`,
+      [marca, modelo, ano || null, km || null, combustivel || null, preco, imagem ?? '', descricao || '', req.params.id]
+    );
+    if (result.rows.length === 0)
+      return res.status(404).json({ error: 'Carro não encontrado.' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erro ao actualizar carro.' });
+  }
+});
+
 // Admin: remover carro (desactivar)
 router.delete('/:id', adminAuth, async (req, res) => {
   try {

@@ -198,6 +198,66 @@
   <p>&copy; 2025 <span>AutoPrime</span> — Painel Administrativo</p>
 </footer>
 
+<!-- MODAL EDITAR CARRO -->
+<div class="modal-overlay" id="modal-editar">
+  <div class="modal">
+    <button class="modal-close" id="editar-close">✕</button>
+    <h2>Editar Carro</h2>
+    <div class="carro-ref" id="editar-ref"></div>
+    <div id="msg-editar"></div>
+    <form id="form-editar">
+      <input type="hidden" id="e-id" />
+      <div class="form-row">
+        <div class="form-group">
+          <label>Marca *</label>
+          <input type="text" id="e-marca" required />
+        </div>
+        <div class="form-group">
+          <label>Modelo *</label>
+          <input type="text" id="e-modelo" required />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Ano</label>
+          <input type="number" id="e-ano" min="1990" max="2030" />
+        </div>
+        <div class="form-group">
+          <label>Quilómetros</label>
+          <input type="number" id="e-km" min="0" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Combustível</label>
+          <select id="e-combustivel">
+            <option value="">Selecione</option>
+            <option>Gasolina</option>
+            <option>Diesel</option>
+            <option>Híbrido</option>
+            <option>Elétrico</option>
+            <option>GPL</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Preço (€) *</label>
+          <input type="number" id="e-preco" min="0" step="0.01" required />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Imagem (deixe vazio para manter a actual)</label>
+        <input type="file" id="e-imagem" accept="image/*" />
+        <img id="e-imagem-preview" class="img-preview" />
+      </div>
+      <div class="form-group">
+        <label>Descrição</label>
+        <textarea id="e-descricao"></textarea>
+      </div>
+      <button type="submit" class="btn" style="width:100%">Guardar Alterações</button>
+    </form>
+  </div>
+</div>
+
 <script src="js/admin.js"></script>
 </body>
 </html>
