@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoPrime — Painel Admin</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Admin-only styles */
+    .admin-nav { background:var(--dark); display:flex; align-items:center; gap:24px; padding:12px 40px; border-bottom:2px solid var(--accent); }
+    .admin-nav a { color:#cbd5e1; font-weight:600; cursor:pointer; text-decoration:none; font-size:0.9rem; transition:color 0.2s; }
+    .admin-nav a:hover, .admin-nav a.active { color:var(--accent); }
+    .admin-nav .logout-btn { margin-left:auto; background:none; border:1px solid #475569; color:#94a3b8; padding:6px 14px; border-radius:6px; cursor:pointer; font-size:0.85rem; }
+    .admin-nav .logout-btn:hover { border-color:var(--accent); color:var(--accent); }
+    .admin-section { display:none; padding:40px 5%; }
+    .admin-section.active { display:block; }
+
+    /* Login */
+    .login-wrap { min-height:80vh; display:flex; align-items:center; justify-content:center; }
+    .login-card { background:white; border-radius:16px; padding:48px 40px; width:100%; max-width:420px; box-shadow:0 8px 40px rgba(0,0,0,0.1); }
+    .login-card h2 { font-size:1.6rem; margin-bottom:6px; }
+    .login-card p { color:var(--gray); margin-bottom:28px; font-size:0.9rem; }
+
+    /* Table */
+    .admin-table { width:100%; border-collapse:collapse; background:white; border-radius:var(--radius); overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.06); }
+    .admin-table th { background:var(--dark); color:white; padding:14px 16px; text-align:left; font-size:0.85rem; font-weight:600; }
+    .admin-table td { padding:14px 16px; border-bottom:1px solid var(--border); font-size:0.9rem; vertical-align:middle; }
+    .admin-table tr:last-child td { border-bottom:none; }
+    .admin-table tr:hover td { background:#f8fafc; }
+    .badge { display:inline-block; padding:4px 10px; border-radius:20px; font-size:0.78rem; font-weight:600; }
+    .badge.pendente { background:#fef3c7; color:#d97706; }
+    .badge.contactado { background:#dbeafe; color:#2563eb; }
+    .badge.concluido { background:#d1fae5; color:#059669; }
+    .badge.cancelado { background:#fee2e2; color:#dc2626; }
+    select.estado-sel { border:1px solid var(--border); border-radius:6px; padding:4px 8px; font-size:0.85rem; cursor:pointer; }
+
+    /* Cards de estatísticas */
+    .stats-admin { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:16px; margin-bottom:32px; }
+    .stat-card { background:white; border-radius:var(--radius); padding:20px; box-shadow:0 4px 16px rgba(0,0,0,0.06); }
+    .stat-card .num { font-size:2rem; font-weight:700; color:var(--accent); }
+    .stat-card .lbl { color:var(--gray); font-size:0.85rem; margin-top:4px; }
+
+    /* Formulário add carro */
+    .add-carro-form { background:white; border-radius:var(--radius); padding:28px; box-shadow:0 4px 16px rgba(0,0,0,0.06); margin-bottom:32px; }
+    .add-carro-form h3 { margin-bottom:20px; }
+    .img-preview { width:100%; height:160px; object-fit:cover; border-radius:8px; margin-top:8px; display:none; }
+    .btn-danger { background:#dc2626; }
+    .btn-danger:hover { background:#b91c1c; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo-text">Auto<span>Prime</span> <span style="font-size:0.9rem;font-weight:400;color:#94a3b8;margin-left:8px">Painel Admin</span></div>
+</header>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-wrap">
+    <div class="login-card">
+      <h2>Acesso Admin</h2>
+      <p>Introduza as suas credenciais para entrar.</p>
+      <div id="msg-login"></div>
+      <form id="form-login">
+        <div class="form-group">
+          <label>Utilizador</label>
+          <input type="text" id="login-user" autocomplete="username" required />
+        </div>
+        <div class="form-group">
+          <label>Palavra-passe</label>
+          <input type="password" id="login-pass" autocomplete="current-password" required />
+        </div>
+        <button type="submit" class="btn" style="width:100%;margin-top:8px">Entrar</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD (após login) -->
+<div id="dashboard" style="display:none">
+  <nav class="admin-nav">
+    <a href="#" class="active" data-tab="compras">Pedidos de Compra</a>
+    <a href="#" data-tab="carros">Gerir Carros</a>
+    <button class="logout-btn" id="btn-logout">Sair</button>
+  </nav>
+
+  <!-- TAB: COMPRAS -->
+  <div class="admin-section active" id="tab-compras">
+    <div class="section-title">Pedidos de Compra</div>
+    <div class="section-sub">Lista de todos os pedidos recebidos</div>
+
+    <div class="stats-admin" id="compras-stats"></div>
+
+    <div id="msg-compras"></div>
+    <div style="overflow-x:auto">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Carro</th>
+            <th>Cliente</th>
+            <th>Email</th>
+            <th>Telefone</th>
+            <th>Mensagem</th>
+            <th>Data</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody id="compras-tbody">
+          <tr><td colspan="8" class="loading">A carregar…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB: CARROS -->
+  <div class="admin-section" id="tab-carros">
+    <div class="section-title">Gerir Carros</div>
+    <div class="section-sub">Adicione ou remova veículos do catálogo</div>
+
+    <div class="add-carro-form">
+      <h3>Adicionar Carro</h3>
+      <div id="msg-add-carro"></div>
+      <form id="form-add-carro">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Marca *</label>
+            <input type="text" id="c-marca" placeholder="ex: BMW" required />
+          </div>
+          <div class="form-group">
+            <label>Modelo *</label>
+            <input type="text" id="c-modelo" placeholder="ex: Série 3" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Ano</label>
+            <input type="number" id="c-ano" placeholder="ex: 2021" min="1990" max="2030" />
+          </div>
+          <div class="form-group">
+            <label>Quilómetros</label>
+            <input type="number" id="c-km" placeholder="ex: 50000" min="0" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Combustível</label>
+            <select id="c-combustivel">
+              <option value="">Selecione</option>
+              <option>Gasolina</option>
+              <option>Diesel</option>
+              <option>Híbrido</option>
+              <option>Elétrico</option>
+              <option>GPL</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Preço (€) *</label>
+            <input type="number" id="c-preco" placeholder="ex: 15000" min="0" step="0.01" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Imagem</label>
+          <input type="file" id="c-imagem" accept="image/*" />
+          <img id="c-imagem-preview" class="img-preview" />
+        </div>
+        <div class="form-group">
+          <label>Descrição</label>
+          <textarea id="c-descricao" placeholder="Breve descrição do veículo…"></textarea>
+        </div>
+        <button type="submit" class="btn">Adicionar Carro</button>
+      </form>
+    </div>
+
+    <div style="overflow-x:auto">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Imagem</th>
+            <th>Marca / Modelo</th>
+            <th>Ano</th>
+            <th>Km</th>
+            <th>Combustível</th>
+            <th>Preço</th>
+            <th>Estado</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+        <tbody id="carros-tbody">
+          <tr><td colspan="8" class="loading">A carregar…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>&copy; 2025 <span>AutoPrime</span> — Painel Administrativo</p>
+</footer>
+
+<script src="js/admin.js"></script>
+</body>
+</html>

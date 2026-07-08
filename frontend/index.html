@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoPrime — Stand de Automóveis</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header>
+  <div class="logo-text">Auto<span>Prime</span></div>
+</header>
+
+<nav>
+  <a href="#" class="active" data-section="inicio">Início</a>
+  <a href="#" data-section="carros">Carros</a>
+  <a href="#" data-section="sobre">Sobre Nós</a>
+  <a href="#" data-section="contacto">Contacto</a>
+  <a href="admin.html" style="margin-left:auto">Admin</a>
+</nav>
+
+<!-- INÍCIO -->
+<section id="inicio" class="active">
+  <div class="hero">
+    <h1>O Seu Próximo Carro<br><span>Começa Aqui</span></h1>
+    <p>Seleção premium de automóveis com as melhores condições do mercado.</p>
+    <a href="#" class="btn" data-section="carros">Ver Carros</a>
+  </div>
+  <div class="stats">
+    <div class="stat"><strong id="stat-carros">—</strong><span>Carros Disponíveis</span></div>
+    <div class="stat"><strong>5+</strong><span>Anos de Experiência</span></div>
+    <div class="stat"><strong>500+</strong><span>Clientes Satisfeitos</span></div>
+    <div class="stat"><strong>100%</strong><span>Garantia de Qualidade</span></div>
+  </div>
+</section>
+
+<!-- CARROS -->
+<section id="carros">
+  <div class="section-title">Carros Disponíveis</div>
+  <div class="section-sub">Encontre o automóvel ideal para si</div>
+  <div id="carros-grid" class="carros-grid">
+    <div class="loading">A carregar carros…</div>
+  </div>
+</section>
+
+<!-- SOBRE -->
+<section id="sobre">
+  <div class="section-title">Sobre a AutoPrime</div>
+  <div class="section-sub">Conheça a nossa história</div>
+  <div class="sobre-grid">
+    <div>
+      <p style="line-height:1.8;color:#475569;margin-bottom:20px">
+        A AutoPrime é um stand de automóveis dedicado a oferecer veículos de qualidade a preços justos.
+        Com mais de 5 anos de experiência no mercado, garantimos a satisfação total dos nossos clientes.
+      </p>
+      <p style="line-height:1.8;color:#475569">
+        Todos os nossos veículos passam por uma inspeção rigorosa antes de serem colocados à venda,
+        assegurando que recebe um automóvel em excelente estado.
+      </p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="sobre-card">
+        <h3>Qualidade Garantida</h3>
+        <p>Cada veículo é inspecionado e certificado pela nossa equipa técnica.</p>
+      </div>
+      <div class="sobre-card">
+        <h3>Melhor Preço</h3>
+        <p>Oferecemos as melhores condições de compra do mercado.</p>
+      </div>
+      <div class="sobre-card">
+        <h3>Apoio ao Cliente</h3>
+        <p>A nossa equipa está sempre disponível para o ajudar.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACTO -->
+<section id="contacto">
+  <div class="section-title">Contacte-nos</div>
+  <div class="section-sub">Estamos aqui para ajudar</div>
+  <div class="sobre-grid">
+    <div>
+      <div class="sobre-card" style="margin-bottom:16px">
+        <h3>Morada</h3>
+        <p>Rua Principal, 123<br>2000-001 Cartaxo</p>
+      </div>
+      <div class="sobre-card" style="margin-bottom:16px">
+        <h3>Telefone</h3>
+        <p>+351 243 000 000</p>
+      </div>
+      <div class="sobre-card">
+        <h3>Email</h3>
+        <p>geral@autoprime.pt</p>
+      </div>
+    </div>
+    <div class="sobre-card">
+      <h3 style="margin-bottom:20px">Enviar Mensagem</h3>
+      <form id="form-contacto">
+        <div class="form-group">
+          <label>Nome *</label>
+          <input type="text" name="nome" required />
+        </div>
+        <div class="form-group">
+          <label>Email *</label>
+          <input type="email" name="email" required />
+        </div>
+        <div class="form-group">
+          <label>Mensagem</label>
+          <textarea name="mensagem" placeholder="A sua mensagem…"></textarea>
+        </div>
+        <div id="msg-contacto"></div>
+        <button type="submit" class="btn">Enviar</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- MODAL PEDIDO DE COMPRA -->
+<div class="modal-overlay" id="modal-compra">
+  <div class="modal">
+    <button class="modal-close" id="modal-close">✕</button>
+    <h2>Pedido de Compra</h2>
+    <div class="carro-ref" id="modal-carro-ref"></div>
+    <div id="msg-compra"></div>
+    <form id="form-compra">
+      <input type="hidden" id="compra-carro-id" />
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nome Completo *</label>
+          <input type="text" id="compra-nome" required />
+        </div>
+        <div class="form-group">
+          <label>Email *</label>
+          <input type="email" id="compra-email" required />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Telefone</label>
+        <input type="tel" id="compra-telefone" placeholder="+351 9XX XXX XXX" />
+      </div>
+      <div class="form-group">
+        <label>Mensagem (opcional)</label>
+        <textarea id="compra-mensagem" placeholder="Alguma questão ou detalhe que queira partilhar…"></textarea>
+      </div>
+      <button type="submit" class="btn" style="width:100%">Enviar Pedido</button>
+    </form>
+  </div>
+</div>
+
+<footer>
+  <p>&copy; 2025 <span>AutoPrime</span> — Todos os direitos reservados</p>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
